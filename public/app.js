@@ -701,6 +701,156 @@ computeBeer();
 // kick off the single shared rate fetch (drives fuel-price + beer cards)
 loadUsdEur();
 
+/* ---------- "Add to Home Screen" prompt (only when not installed) ---------- */
+
+// Shows a one-time, dismissible sheet explaining how to install the PWA.
+// Skipped entirely when the app is already running standalone (from the home
+// screen). On Chromium we offer a native one-tap install; on iOS/other browsers
+// we show manual steps, since they don't fire `beforeinstallprompt`.
+(function installPrompt() {
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true            // iOS Safari
+    || document.referrer.startsWith('android-app://');  // Android TWA
+  if (isStandalone) return; // already installed — nothing to nag about
+
+  const DISMISS_KEY = 'fc.a2hs';     // 'dismissed' = never show again
+  const SNOOZE_KEY = 'fc.a2hsSnooze'; // epoch ms; hidden until then
+  if (LS.get(DISMISS_KEY, '') === 'dismissed') return;
+  if (Date.now() < (Number(LS.get(SNOOZE_KEY, '0')) || 0)) return;
+
+  const ua = navigator.userAgent || '';
+  const isIOS = /iphone|ipad|ipod/i.test(ua)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPadOS
+  const isAndroid = /android/i.test(ua);
+
+  let deferredPrompt = null; // Chromium's captured beforeinstallprompt event
+  let shown = false;
+  let overlay, sheet, body, actions;
+
+  function build() {
+    overlay = document.createElement('div');
+    overlay.className = 'a2hs-overlay';
+
+    sheet = document.createElement('div');
+    sheet.className = 'a2hs-sheet';
+
+    const close = document.createElement('button');
+    close.className = 'a2hs-close';
+    close.setAttribute('aria-label', 'Close');
+    close.textContent = '×';
+    close.addEventListener('click', () => dismiss('forever'));
+
+    const icon = document.createElement('img');
+    icon.className = 'a2hs-icon';
+    icon.src = '/icons/icon-192.png';
+    icon.alt = '';
+
+    const title = document.createElement('h2');
+    title.className = 'a2hs-title';
+    title.textContent = 'Add Freedom Units to your Home Screen';
+
+    body = document.createElement('div');
+    body.className = 'a2hs-body';
+
+    actions = document.createElement('div');
+    actions.className = 'a2hs-actions';
+
+    sheet.append(close, icon, title, body, actions);
+    overlay.appendChild(sheet);
+    document.body.appendChild(overlay);
+
+    // tapping the dimmed backdrop snoozes (a soft "not now")
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) dismiss('snooze'); });
+  }
+
+  function addButton(label, fn, variant) {
+    const b = document.createElement('button');
+    b.className = 'a2hs-btn ' + variant;
+    b.textContent = label;
+    b.addEventListener('click', fn);
+    actions.appendChild(b);
+  }
+
+  function renderNative() {
+    body.innerHTML = '<p>Install the app for a full-screen, offline-ready experience — just one tap.</p>';
+    addButton('Install', async () => {
+      if (!deferredPrompt) { dismiss('snooze'); return; }
+      deferredPrompt.prompt();
+      try { await deferredPrompt.userChoice; } catch {}
+      deferredPrompt = null;
+      dismiss('forever');
+    }, 'primary');
+    addButton('Maybe later', () => dismiss('snooze'), 'ghost');
+  }
+
+  function renderIOS() {
+    body.innerHTML =
+      '<p>Install the app for a full-screen, offline-ready experience:</p>' +
+      '<ol class="a2hs-steps">' +
+        '<li>Tap the <strong>Share</strong> button ' +
+          '<svg class="a2hs-glyph" viewBox="0 0 24 24" width="18" height="18" fill="none" ' +
+          'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+          '<path d="M12 3v12"/><path d="M8 7l4-4 4 4"/>' +
+          '<path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg> in the toolbar.</li>' +
+        '<li>Scroll down and choose <strong>Add to Home Screen</strong> ' +
+          '<span class="a2hs-glyph-box">+</span>.</li>' +
+        '<li>Tap <strong>Add</strong> in the top-right corner.</li>' +
+      '</ol>';
+    addButton('Got it', () => dismiss('forever'), 'primary');
+  }
+
+  function renderManual() {
+    body.innerHTML =
+      '<p>Install the app for a full-screen, offline-ready experience:</p>' +
+      '<ol class="a2hs-steps">' +
+        '<li>Open the browser menu <span class="a2hs-glyph-box">⋮</span>.</li>' +
+        '<li>Tap <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li>' +
+      '</ol>';
+    addButton('Got it', () => dismiss('forever'), 'primary');
+  }
+
+  function show(kind) {
+    if (shown) return;
+    if (!overlay) build();
+    body.innerHTML = '';
+    actions.innerHTML = '';
+    if (kind === 'native') renderNative();
+    else if (isIOS) renderIOS();
+    else renderManual();
+    shown = true;
+    void overlay.offsetWidth; // force reflow so the slide-up transition runs
+    overlay.classList.add('open');
+  }
+
+  function dismiss(mode) {
+    if (mode === 'forever') LS.set(DISMISS_KEY, 'dismissed');
+    else if (mode === 'snooze') LS.set(SNOOZE_KEY, String(Date.now() + 7 * 24 * 3600 * 1000));
+    if (overlay) {
+      overlay.classList.remove('open');
+      const o = overlay;
+      setTimeout(() => o.remove(), 280);
+      overlay = null;
+    }
+    shown = false;
+  }
+
+  // Chromium offers a real install prompt — capture it for a one-tap button.
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    show('native');
+  });
+  // If the user installs mid-session, drop the sheet for good.
+  window.addEventListener('appinstalled', () => dismiss('forever'));
+
+  // iOS (and some Android browsers) never fire beforeinstallprompt. Give
+  // Chromium a moment to fire first, then fall back to manual instructions.
+  setTimeout(() => {
+    if (shown || deferredPrompt) return;
+    if (isIOS || isAndroid) show('manual');
+  }, 1500);
+})();
+
 /* ---------- service worker (offline support) ---------- */
 
 if ('serviceWorker' in navigator) {
