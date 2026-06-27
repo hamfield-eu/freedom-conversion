@@ -1,5 +1,5 @@
 /* Freedom Units service worker — cache the app shell so conversions work offline. */
-const CACHE = 'freedom-units-v9';
+const CACHE = 'freedom-units-v10';
 const SHELL = [
   '/',
   '/index.html',

@@ -1,6 +1,6 @@
 {
   "name": "Freedom Units",
-  "short_name": "Freedom Conversion",
+  "short_name": "Freedom Units",
   "description": "Convert US units to metric, plus USD to EUR.",
   "start_url": "/",
   "scope": "/",
