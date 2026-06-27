@@ -177,17 +177,30 @@ body {
   font-size: 1rem;
   font-weight: 600;
   color: var(--text);
-  background: var(--bg-input);
+  background-color: var(--bg-input);
+  /* chevron so it's obvious the field is a tap-to-open dropdown */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2398a2c4' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px 16px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  padding: 12px 10px;
+  padding: 12px 36px; /* symmetric room so centered text stays centered next to the chevron */
   outline: none;
   appearance: none;
   -webkit-appearance: none;
+  cursor: pointer;
   text-align: center;
   text-align-last: center;
 }
-.cur-select:focus { border-color: var(--accent); }
+.cur-select:focus {
+  border-color: var(--accent);
+  /* tint the chevron with the accent color on focus */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234f7cff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+/* left-aligned dropdowns (units, beer): pull text back to the left edge,
+   keep the right room for the chevron. Higher specificity than .cur-select. */
+.cur-select.unit-select { padding-left: 14px; }
 .swap-btn {
   appearance: none;
   background: none;
