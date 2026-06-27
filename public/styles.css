@@ -1,0 +1,337 @@
+:root {
+  --bg: #0a0e1f;
+  --bg-elev: #141b33;
+  --bg-input: #0e1426;
+  --line: #28324f;
+  --text: #f2f5ff;
+  --muted: #98a2c4;
+  --usa-blue: #4f7cff;
+  --usa-red: #ef4060;
+  --accent: var(--usa-blue);
+  --accent-2: var(--usa-red);
+  --good: #2ecc71;
+  --danger: #ff6b6b;
+  --radius: 18px;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: 'Outfit', var(--font-body);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(79, 124, 255, .14), transparent 60%),
+    radial-gradient(900px 500px at 50% 110%, rgba(239, 64, 96, .10), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 17px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+  /* respect the iPhone notch / home indicator in standalone mode */
+  padding:
+    calc(env(safe-area-inset-top) + 14px)
+    calc(env(safe-area-inset-right) + 14px)
+    calc(env(safe-area-inset-bottom) + 14px)
+    calc(env(safe-area-inset-left) + 14px);
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.app-header { text-align: center; margin: 8px 0 22px; }
+.app-header h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2.4rem;
+  letter-spacing: -.5px;
+  line-height: 1.05;
+  background: linear-gradient(100deg, #6f97ff 0%, #ffffff 50%, #ff7088 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+/* stars-and-stripes divider under the title */
+.app-header h1::after {
+  content: "";
+  display: block;
+  width: 96px;
+  height: 4px;
+  margin: 10px auto 0;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--usa-blue) 0 33%, #ffffff 33% 66%, var(--usa-red) 66% 100%);
+}
+.tagline { margin: 8px 0 0; color: var(--muted); font-size: .92rem; letter-spacing: .2px; }
+
+.cards { display: flex; flex-direction: column; gap: 16px; }
+
+.card {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .03), transparent 120px),
+    var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 16px 18px;
+  box-shadow: 0 10px 30px -18px rgba(0, 0, 0, .8);
+  overflow: hidden;
+}
+/* colored accent strip along the top of each card */
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  opacity: .85;
+}
+.card.currency::before { background: var(--usa-blue); }
+.card.beer::before { background: var(--usa-red); }
+
+.card-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 2px 2px 12px;
+}
+.card-title .name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -.2px;
+}
+.card-title .meta { color: var(--muted); font-size: .78rem; text-align: right; }
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.field { position: relative; }
+.field input {
+  width: 100%;
+  font-size: 1.35rem;
+  font-weight: 600;
+  padding: 14px 12px 14px 12px;
+  color: var(--text);
+  background: var(--bg-input);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  outline: none;
+  text-align: left;
+  -moz-appearance: textfield;
+}
+.field input::-webkit-outer-spin-button,
+.field input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.field input:focus { border-color: var(--accent); }
+.field .unit {
+  display: block;
+  margin: 6px 4px 0;
+  color: var(--muted);
+  font-size: .8rem;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+
+.swap {
+  font-size: 1.2rem;
+  color: var(--muted);
+  user-select: none;
+  text-align: center;
+}
+
+.refresh {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--bg-input);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 4px 10px;
+  font-size: .8rem;
+  cursor: pointer;
+}
+.refresh:active { transform: scale(.96); }
+.refresh:disabled { opacity: .4; cursor: default; }
+.refresh:disabled:active { transform: none; }
+
+.cur-selectors {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.cur-selectors.single { grid-template-columns: 1fr; }
+.unit-select { text-align: left; text-align-last: left; }
+.cur-select {
+  width: 100%;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg-input);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 10px;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: center;
+  text-align-last: center;
+}
+.cur-select:focus { border-color: var(--accent); }
+.swap-btn {
+  appearance: none;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.3rem;
+  padding: 4px 6px;
+  cursor: pointer;
+}
+.swap-btn:active { transform: scale(.9); }
+
+.markup-row { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.markup-row label { color: var(--muted); font-size: .85rem; }
+.markup-row .pct { color: var(--muted); }
+
+/* markup + sales-tax fee inputs (two columns) */
+.fees-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; margin-top: 14px; }
+.fee { display: flex; align-items: center; gap: 6px; }
+.fee label { color: var(--muted); font-size: .85rem; flex: 1; }
+.fee .pct { color: var(--muted); }
+.fee .markup-input { width: 58px; }
+.unit-note { margin-top: 10px; text-align: center; }
+.markup-input {
+  width: 84px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg-input);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 10px;
+  outline: none;
+  -moz-appearance: textfield;
+}
+.markup-input::-webkit-outer-spin-button,
+.markup-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.markup-input:focus { border-color: var(--accent); }
+
+.cur-meta { margin-top: 12px; }
+
+/* beer price check */
+.beer-result {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+.beer-col { text-align: center; }
+.beer-eur {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -.5px;
+  background: linear-gradient(90deg, var(--usa-blue), var(--usa-red));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.beer-cap {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+.beer-vs { color: var(--muted); font-size: .9rem; }
+.beer-note { margin-top: 10px; text-align: center; }
+.beer-verdict {
+  margin-top: 8px;
+  text-align: center;
+  font-weight: 600;
+  font-size: .95rem;
+  color: var(--text);
+}
+.beer-verdict.good { color: var(--good); }
+.beer-verdict.bad { color: var(--danger); }
+.beer-disclaimer {
+  margin-top: 10px;
+  text-align: center;
+  color: var(--muted);
+  font-size: .7rem;
+  opacity: .8;
+}
+.loc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.loc-btn {
+  appearance: none;
+  flex: none;
+  background: var(--bg-input);
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: .85rem;
+  cursor: pointer;
+}
+.loc-btn:active { transform: scale(.97); }
+.loc-btn:disabled { opacity: .5; cursor: default; }
+.beer-loc { color: var(--muted); font-size: .8rem; }
+.beer-loc.error { color: var(--danger); }
+
+.app-footer { margin-top: 20px; text-align: center; }
+.status { color: var(--muted); font-size: .78rem; }
+.status.error { color: var(--danger); }
+
+.powered-by {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+  opacity: .45;
+}
+.powered-by:hover { opacity: .7; transition: opacity .2s; }
+.powered-by-label {
+  color: var(--muted);
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+.hamfield-logo {
+  height: 16px;
+  width: auto;
+  filter: invert(1);
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 4px 2px;
+  color: var(--muted);
+  font-size: .72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+.section-label::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--usa-blue), var(--usa-red));
+}

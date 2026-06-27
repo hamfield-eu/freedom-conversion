@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+  <title>Freedom Units</title>
+  <meta name="description" content="Convert US 'freedom units' to metric, plus USD &rarr; EUR." />
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#0a0e1f" />
+
+  <!-- iOS: add-to-homescreen, full screen standalone -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Freedom" />
+  <link rel="apple-touch-icon" href="/icons/icon-180.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+
+  <!-- Fonts (progressive enhancement; falls back to system fonts offline) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" />
+
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>Freedom&nbsp;Units</h1>
+    <p class="tagline">USA &rarr; the rest of the world</p>
+  </header>
+
+  <main id="cards" class="cards"></main>
+
+  <footer class="app-footer">
+    <span id="status" class="status"></span>
+    <div class="powered-by">
+      <span class="powered-by-label">Powered by</span>
+      <a href="https://hamfield.eu" target="_blank" rel="noopener noreferrer">
+        <img src="/hamfield-grayscale-logo.svg" alt="Hamfield" class="hamfield-logo" />
+      </a>
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

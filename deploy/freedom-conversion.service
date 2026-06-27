@@ -1,0 +1,25 @@
+[Unit]
+Description=Freedom Units converter (Node + Frankfurter currency)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Adjust WorkingDirectory to wherever you deploy the app on the LXC container.
+WorkingDirectory=/opt/freedom-conversion/server
+ExecStart=/usr/bin/node server.js
+# Optional: leading "-" means the service still starts if the file is absent
+# (no secrets are required for the Frankfurter API).
+EnvironmentFile=-/opt/freedom-conversion/server/.env
+Restart=on-failure
+RestartSec=3
+# Run as an unprivileged user you create, e.g. `adduser --system --group freedom`
+User=freedom
+Group=freedom
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=full
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
